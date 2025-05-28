@@ -1,0 +1,18 @@
+@startuml
+skinparam linetype ortho
+actor Office as "Сотрудник офиса"
+rectangle API as "API Gateway"
+rectangle Payment as "Payment Service"
+rectangle Billing as "Billing Service"
+queue Kafka
+database DWH
+rectangle BI as "BI‑портал / Power BI"
+
+Office --> API : запросы платежей / счетов
+API --> Payment : REST
+API --> Billing : REST
+Payment --> Kafka : Платёж завершен
+Billing --> Kafka : Счёт выставлен
+Kafka --> DWH   : фин. события
+DWH --> BI      : агрегаты (финансы)
+@enduml

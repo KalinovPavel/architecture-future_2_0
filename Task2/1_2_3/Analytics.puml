@@ -1,0 +1,13 @@
+@startuml
+skinparam linetype ortho
+queue Kafka
+rectangle Camel as "Apache Camel ETL"
+database DWH
+rectangle BI as "Power BI"
+rectangle SelfBI as "BI‑портал"
+
+Kafka --> Camel : фин. события
+Camel --> DWH   : batch / stream load
+DWH --> BI      : отчёты
+DWH --> SelfBI  : self‑service
+@enduml

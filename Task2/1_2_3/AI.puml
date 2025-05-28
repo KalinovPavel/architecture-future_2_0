@@ -1,0 +1,13 @@
+@startuml
+skinparam linetype ortho
+queue Kafka
+rectangle AISvc as "AI Service"
+rectangle ModelStore as "Model Store"
+rectangle EMR as "EMR Service"
+rectangle Payment as "Payment Service"
+
+Kafka --> AISvc : StudyEvent / PatientEvent / PaymentEvent
+AISvc --> ModelStore : save / load models
+AISvc --> EMR : DiagnosticInsight
+AISvc --> Payment : FraudScore
+@enduml
