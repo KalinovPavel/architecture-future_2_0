@@ -1,0 +1,85 @@
+@startuml
+!pragma layout smetana
+title **Будущее 2.0 – Целевая архитектура**
+skinparam linetype ortho
+
+'-- внешние пользователи --
+actor OfficeUser as "Сотрудник офиса"
+actor ClinicOp  as "Оператор клиники / Врач"
+
+'-- единая точка входа --
+component API as "API Gateway" <<API Gateway>>
+
+'====================== домены ======================
+package "Финансовый домен (FinTech)" {
+  component PaymentSvc as "Payment Service\n(оплата)" <<Microservice, Java/Golang>>
+  database  PaymentDB  as "Payment DB"
+  PaymentSvc - PaymentDB
+  component BillingSvc  as "Billing Service\n(биллинг)" <<Microservice, Java/Golang>>
+  database  BillingDB   as "Billing DB"
+  BillingSvc - BillingDB
+}
+
+package "Медицинский домен" {
+  component EMRsvc      as "EMR Service\n(мед. карты)" <<Microservice>>
+  database  EMRdb       as "EMR DB"
+  EMRsvc - EMRdb
+  component ResearchSvc as "Research Service\n(исследования)" <<Microservice, Python>>
+  database  ResearchDB  as "Research DB"
+  ResearchSvc - ResearchDB
+}
+
+package "Домен ИИ/ML" {
+  component AISvc  as "AI Service\n(диагностика, аналитика)" <<Microservice, Python>>
+  database  ModelDB as "Model Store"
+  AISvc - ModelDB
+}
+
+node "Медицинское оборудование /\nдиагностические устройства" as MedEquip
+
+'================ инфраструктура / интеграция ================
+node "Интеграционная шина (Apache Camel)" as Camel
+queue Kafka as "Event Bus (Kafka)"
+
+database DWH as "Enterprise DWH\n(MS SQL 2008/>\nили Cloud DW)"
+rectangle BI as "Power BI\n(отчёты и анализ)"
+rectangle SelfBI as "BI Self-Service Portal\n(витрина данных)"
+
+'======================= потоки ======================
+OfficeUser --> API  : HTTP
+ClinicOp  --> API  : HTTP / gRPC
+ClinicOp  --> MedEquip : управление обследованием
+
+MedEquip --> ResearchSvc : "DICOM/HL7\nснимки, сигналы"
+MedEquip --> AISvc       : реальные изображения для\nэкспресс-диагностики
+
+API --> PaymentSvc  : REST
+API --> BillingSvc  : REST
+API --> EMRsvc      : REST
+API --> ResearchSvc : REST
+
+PaymentSvc  --> Kafka : события оплаты
+BillingSvc  --> Kafka : события биллинга
+EMRsvc      --> Kafka : PatientEvent (обезличено)
+ResearchSvc --> Kafka : StudyEvent (обезличено)
+
+Kafka --> AISvc : поток данных (мед + фин)
+AISvc --> EMRsvc : Оценка рисков (рекомендации)
+AISvc --> PaymentSvc : Risk-Score API
+
+Kafka --> Camel : потоки для ETL
+Camel --> DWH   : загрузка данных
+'-- важное ограничение: --> DWH только финансы и управление --
+Kafka --> DWH   : потоковая загрузка (НЕ включает необезличенные медданные)
+
+DWH --> BI      : агрегированные данные
+DWH --> SelfBI  : агрегированные данные
+OfficeUser --> SelfBI : просмотр / конструктор отчётов
+
+note right of DWH
+  В DWH и BI *не* попадают:
+  • истории болезней
+  • результаты мед. исследований
+  • исходные диагностические изображения
+end note
+@enduml
