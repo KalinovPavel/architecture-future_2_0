@@ -1,0 +1,44 @@
+@startgantt
+caption **Роадмап трансформации архитектуры (2025-2026)**
+
+project starts 2025-06-01
+printscale weekly
+scale 2
+
+-- Июнь 2025 --
+[Архитектура и дизайн] as [A1] lasts 30 days and is colored in #87CEEB
+[A1] is 100% completed
+
+-- Июль 2025 --
+[Инфраструктура (CI/CD, Kafka)] as [A2] starts 2025-07-01 and lasts 30 days and is colored in #98FB98
+[A2] is 100% completed
+
+-- Август-Октябрь 2025 --
+[Микросервисы (финансы, медицина)] as [A3] starts 2025-08-01 and lasts 90 days and is colored in #FFD700
+[A3] is 100% completed
+
+-- Ноябрь-Декабрь 2025 --
+[Потоки данных и DWH] as [A4] starts 2025-11-01 and lasts 60 days and is colored in #FFA07A
+[A4] is 100% completed
+
+-- Январь-Февраль 2026 --
+[Интеграция и миграция] as [A5] starts 2026-01-01 and lasts 60 days and is colored in #DDA0DD
+[A5] is 100% completed
+
+-- Март 2026 --
+[Релиз и декомиссия legacy] as [A6] starts 2026-03-01 and lasts 30 days and is colored in #90EE90
+[A6] is 100% completed
+
+
+[ ] starts 2026-03-31 and lasts 45 days and is colored in #FFFFFF00
+
+
+-- Вехи --
+[Завершение дизайна] happens at 2025-06-30
+[Запуск инфраструктуры] happens at 2025-07-31
+[Готовность микросервисов] happens at 2025-10-30
+[DWH модернизирован] happens at 2025-12-30
+[Миграция завершена] happens at 2026-02-28
+[Финальный релиз] happens at 2026-03-31
+
+@endgantt

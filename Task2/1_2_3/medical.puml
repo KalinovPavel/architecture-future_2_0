@@ -1,0 +1,25 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam participantPadding 20
+actor Clinic as "Врач / Оператор"
+participant MedEquip as "Медицинское оборудование"
+participant AISvc as "AI‑Service"
+participant Research as "Research Service"
+participant API as "API Gateway"
+participant EMR as "EMR Service"
+
+Clinic --> MedEquip : запуск обследования
+MedEquip --> Research : изображения, сигналы
+MedEquip --> AISvc    : изображения real‑time
+
+Clinic --> API : мед. запросы (назначения, результаты)
+API --> EMR : REST (обновление карт)
+API --> Research : REST (передача метаданных исследований)
+
+EMR --> Kafka : PatientEvent (аноним.)
+Research --> Kafka : StudyEvent (аноним.)
+Kafka --> AISvc : поток для ML/аналитики
+
+AISvc --> EMR : DiagnosticInsight
+AISvc --> Clinic : оповещение / рекомендации
+@enduml
